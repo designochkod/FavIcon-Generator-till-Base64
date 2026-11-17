@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Favicon Generator — Base64</title>
+<style>
+	:root{
+	  --bg:#0b0f14;
+	  --card:#0f1720;
+	  --muted:#9aa4b2;
+	  --accent:#7dd3fc;
+	  --success:#34d399;
+	  --danger:#fb7185;
+	  --glass: rgba(255,255,255,0.03);
+	  --radius:14px;
+	  font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+	  color-scheme: dark;
+	}
+	*,
+	*::before,
+	*::after{box-sizing:border-box;}
+
+	html,body{height:100%;margin:0;padding:0;background:linear-gradient(180deg,#041018 0%, #07121a 100%);color:#e6eef6;-webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;}
+	body{
+	  display:flex;
+	  align-items:flex-start;
+	  justify-content:center;
+	  padding:20px;
+	  line-height:1.35;
+	  min-height:100vh;
+	  overflow-x:hidden;
+	}
+
+	.container{
+	  width:100%;
+	  max-width:1200px;
+	  margin:0 auto;
+	  background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+	  border:1px solid rgba(255,255,255,0.03);
+	  box-shadow: 0 8px 30px rgba(2,6,23,0.7);
+	  border-radius:var(--radius);
+	  padding:18px;
+	  box-sizing:border-box;
+	  overflow:hidden;
+	}
+	
+	header{
+	  display:flex;
+	  gap:12px;
+	  align-items:center;
+	  margin-bottom:12px;
+	  flex-wrap:nowrap;
+	  min-width:0;
+	}
+
+	header > div{
+	  min-width:0;
+	  flex:1 1 auto;
+	}
+
+	h1{
+	  font-size:18px;
+	  margin:0;
+	  white-space:nowrap;
+	  overflow:hidden;
+	  text-overflow:ellipsis;
+	}
+	p.lead{
+	  margin:4px 0 0;
+	  color:var(--muted);
+	  font-size:12px;
+	  white-space:nowrap;
+	  overflow:hidden;
+	  text-overflow:ellipsis;
+	}
+	
+	.logo{
+	  width:48px;height:48px;border-radius:10px;background:linear-gradient(135deg,var(--accent),#5eead4);
+	  display:flex;align-items:center;justify-content:center;font-weight:700;color:#022;
+	  box-shadow:0 6px 18px rgba(7,19,28,0.6);
+	  flex:0 0 48px;
+	}
+	.grid{
+	  display:grid;
+	  grid-template-columns: 1fr 360px;
+	  gap:16px;
+	  align-items:start;
+	  margin-top:16px;
+	}
+
+	.card{
+	  background:var(--card);
+	  border-radius:12px;
+	  padding:14px;
+	  border:1px solid rgba(255,255,255,0.03);
+	  box-shadow: inset 0 1px 0 rgba(255,255,255,0.01);
+	}
+
+	.controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+	.btn{
+	  background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+	  border:1px solid rgba(255,255,255,0.04);
+	  color:var(--accent);
+	  padding:8px 12px;border-radius:10px;cursor:pointer;font-weight:600;font-size:13px;
+	}
+	input[type="file"]{color:var(--muted);max-width:100%}
+
+	.preview{display:flex;gap:12px;align-items:center;flex-wrap:nowrap;min-width:0}
+	.favicon-preview{
+	  width:64px;height:64px;border-radius:10px;background:var(--glass);display:flex;align-items:center;justify-content:center;
+	  border:1px solid rgba(255,255,255,0.02);
+	  overflow:hidden;flex:0 0 64px;
+	}
+	img.fav-img{width:100%;height:100%;object-fit:cover;display:block}
+	label.small{font-size:13px;color:var(--muted)}
+	.small-muted{font-size:12px;color:var(--muted)}
+
+	textarea.output{
+	  width:100%;height:180px;background:#061017;border-radius:10px;border:1px solid rgba(255,255,255,0.02);
+	  color:#d8eefb;padding:12px;resize:vertical;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;min-height:120px;box-sizing:border-box;
+	}
+
+	.right-column{display:flex;flex-direction:column;gap:12px}
+	.copy-btn{background:var(--success);color:#022;padding:8px 10px;border-radius:8px;border:none;cursor:pointer;font-weight:700}
+	.danger-btn{background:var(--danger);color:white;padding:8px 10px;border-radius:8px;border:none;cursor:pointer}
+	.footer{display:flex;justify-content:space-between;align-items:center;margin-top:12px;color:var(--muted);font-size:12px;flex-wrap:wrap}
+	.note{font-size:13px;color:var(--muted)}
+
+	@media (max-width:920px){
+	  .grid{
+	    grid-template-columns: 1fr 320px;
+	    gap:12px;
+	  }
+	  .container{padding:16px;}
+	}
+
+	@media (max-width:760px){
+	  .grid{
+	    grid-template-columns: 1fr;
+	  }
+	  header{align-items:flex-start;}
+	  .preview{gap:10px}
+	  .favicon-preview{width:56px;height:56px;flex:0 0 56px}
+	  textarea.output{height:160px}
+	}
+
+	@media (max-width:420px){
+	  body{padding:12px;}
+	  .container{padding:12px;border-radius:12px;}
+	  h1{font-size:16px}
+	  .logo{width:44px;height:44px;flex:0 0 44px}
+	  .favicon-preview{width:48px;height:48px;flex:0 0 48px}
+	  .btn{padding:7px 10px;font-size:13px}
+	  .copy-btn{padding:7px 10px}
+	  textarea.output{height:140px;font-size:13px}
+	  .grid{gap:10px}
+	}	
+	.container *{max-width:100%;word-break:break-word;}
+	pre{white-space:pre-wrap;word-break:break-word;}
+</style>
+</head>
+<body>
+  <div class="container" role="main">
+    <header>
+      <div class="logo">F</div>
+      <div>
+        <h1>Favicon → Base64</h1>
+        <p class="lead">base64 för &lt;link rel="shortcut icon" href="..."&gt;</p>
+      </div>
+    </header>
+
+    <div class="grid">
+      <div class="card">
+        <div class="row" style="justify-content:space-between">
+          <div>
+            <div class="controls" style="margin-top:8px;">
+              <input id="file" type="file" accept="image/jpeg,image/jpg,image/png" />
+              <button id="clear" class="btn" title="Rensa">Rensa</button>
+            </div>
+            <p class="small-muted" style="margin-top:8px">Max: webbläsarens filstorleksbegränsning. För bästa resultat: kvadratisk bild eller 256×256.</p>
+          </div>
+          <div class="preview">
+            <div class="favicon-preview" id="previewBox" title="Favicon-förhandsvisning">
+              <img id="previewImg" class="fav-img" alt="" src="" style="display:none"/>
+              <svg id="placeholder" width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;opacity:0.6">
+                <rect width="24" height="24" rx="4" fill="#0b1720"/>
+                <path d="M7 14l3-4 2.5 3 4-6" stroke="#7dd3fc" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div style="min-width:0">
+              <div class="small-muted">Förhandsvisning</div>
+              <div class="note" id="imgInfo" style="margin-top:6px">Ingen bild vald</div>
+            </div>
+          </div>
+        </div>
+
+        <hr style="border:none;border-top:1px solid rgba(255,255,255,0.09);margin:14px 0">
+
+        <div>
+          <div style="margin-bottom:10px;margin-left:5px" class="small-muted">base64 genererat resultat:</div>
+          <textarea style="margin-bottom:10px" id="output" class="output" readonly placeholder='base64 för komplett <link rel="shortcut icon" href="data:image/png;base64,..."> visas här' ></textarea>
+          <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+            <button id="copy" class="copy-btn">Kopiera href</button>
+            <button id="apply" class="btn" title="Sätt som aktuell favicon i denna sida">Testa på denna sidan</button>
+			<button id="download" class="btn" title="Ladda ner favicon" style="display:none">Ladda ner .ico/png</button>
+            <button id="download-png" class="btn" style="display:none">Ladda ner PNG</button>
+            <button id="download-ico" class="btn" style="display:none">Ladda ner ICO (om möjligt)</button>
+          </div>
+        </div>
+      </div>
+
+	  <div class="right-column">
+	    <div class="card" style="padding:12px;">
+	      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 6px 0;">
+	        <div>
+	          <div class="small-muted" style="font-weight:700;margin:0;font-size:16px;">Instruktioner</div>
+	        </div>
+	      </div>
+
+	      <div class="small-muted" style="margin:0;font-size:14px;">
+	        Knappen "Använd i sidan" sätter filen som aktuell favicon i denna öppna sida (eller kopiera href till ditt dokument).
+	      </div>
+	    </div>
+
+	    <div class="card" style="padding:12px;">
+	      <div style="font-weight:700;font-size:14px;margin:0 0 6px 0;">Snabbtips</div>
+	      <ul style="margin:0;padding-left:16px;color:var(--muted);font-size:14px;line-height:1.3;">
+	        <li style="margin:6px 0;">För bästa kompatibilitet använd 32×32 eller 16×16.</li>
+	        <li style="margin:6px 0;">PNG stöds i moderna webbläsare; .ico kan krävas för vissa äldre.</li>
+	        <li style="margin:6px 0;">Skala ner bilden före uppladdning för kortare base64-sträng.</li>
+	      </ul>
+	    </div>
+	  </div>
+      
+
+    <div class="footer">
+      <div class="small-muted"></div>
+      <div class="small-muted"></div>
+    </div>
+  </div>
+
+<script>
+const fileInput = document.getElementById('file');
+const previewImg = document.getElementById('previewImg');
+const placeholder = document.getElementById('placeholder');
+const previewBox = document.getElementById('previewBox');
+const imgInfo = document.getElementById('imgInfo');
+const output = document.getElementById('output');
+const copyBtn = document.getElementById('copy');
+const applyBtn = document.getElementById('apply');
+const clearBtn = document.getElementById('clear');
+const downloadBtn = document.getElementById('download');
+const downloadPngBtn = document.getElementById('download-png');
+const downloadIcoBtn = document.getElementById('download-ico');
+function resetUI(){
+  previewImg.style.display='none';
+  placeholder.style.display='block';
+  imgInfo.textContent='Ingen bild vald';
+  output.value='';
+  downloadBtn.style.display='none';
+  downloadPngBtn.style.display='none';
+  downloadIcoBtn.style.display='none';
+}
+resetUI();
+fileInput.addEventListener('change', async (e)=>{
+  const f = e.target.files && e.target.files[0];
+  if(!f){ resetUI(); return; }
+  if (!/^image\/(png|jpeg)$/.test(f.type)) {
+    alert('Endast JPG/JPEG eller PNG tillåtet.');
+    fileInput.value='';
+    resetUI();
+    return;
+  }
+  const url = URL.createObjectURL(f);
+  previewImg.src = url;
+  previewImg.style.display='block';
+  placeholder.style.display='none';
+  const img = await loadImage(url);
+  URL.revokeObjectURL(url);
+  const maxSize = 256;
+  const [w,h] = [img.width, img.height];
+  const scale = Math.min(1, maxSize / Math.max(w,h));
+  const nw = Math.round(w * scale);
+  const nh = Math.round(h * scale);
+  const canvas = document.createElement('canvas');
+  canvas.width = nw;
+  canvas.height = nh;
+  const ctx = canvas.getContext('2d');
+  if(f.type === 'image/jpeg' || f.type === 'image/jpg'){
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+  } else {
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+  }
+  ctx.drawImage(img,0,0,nw,nh);
+  const dataUrl = canvas.toDataURL('image/png');
+  output.value = dataUrl;
+  imgInfo.textContent = `${w}×${h} → ${nw}×${nh} (${Math.round((f.size||0)/1024)} KB)`;
+  downloadPngBtn.style.display='inline-block';
+  downloadPngBtn.onclick = ()=>downloadDataUrl(dataUrl, 'favicon.png');
+  downloadBtn.style.display='inline-block';
+  downloadBtn.onclick = ()=>downloadDataUrl(dataUrl, 'favicon.png');
+});
+
+copyBtn.addEventListener('click', async () => {
+  if (!output.value) return;
+  const hrefString = `<link rel="shortcut icon" href="${output.value}">`;
+  try {
+    await navigator.clipboard.writeText(hrefString);
+    copyBtn.textContent = 'Kopierat ✓';
+    setTimeout(() => (copyBtn.textContent = 'Kopiera href'), 1500);
+  } catch (e) {
+	  output.value = hrefString;
+    output.select();
+    try { document.execCommand('copy'); copyBtn.textContent = 'Kopierat ✓'; setTimeout(() => (copyBtn.textContent = 'Kopiera href'), 1500); }
+    catch (_) { alert('Kopiera manuellt: markera texten och tryck Ctrl/Cmd+C.'); }
+  }
+});
+
+applyBtn.addEventListener('click', ()=>{
+  if(!output.value) return;
+  setFavicon(output.value);
+});
+
+clearBtn.addEventListener('click', ()=>{
+  fileInput.value='';
+  resetUI();
+});
+
+function loadImage(src){
+  return new Promise((res,rej)=>{
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = ()=>res(img);
+    img.onerror = rej;
+    img.src = src;
+  });
+}
+
+function setFavicon(dataUrl){
+	const rels = ['icon','shortcut icon','apple-touch-icon'];
+  document.querySelectorAll('link').forEach(l=>{
+    const r = (l.getAttribute('rel')||'').toLowerCase();
+    if(rels.includes(r)) l.remove();
+  });
+  const link = document.createElement('link');
+  link.rel = 'shortcut icon';
+  link.href = dataUrl;
+  document.head.appendChild(link);
+  previewImg.src = dataUrl;
+  previewImg.style.display='block';
+  placeholder.style.display='none';
+}
+
+function downloadDataUrl(dataUrl, filename){
+  const a = document.createElement('a');
+  a.href = dataUrl;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+}
+</script>
+</body>
+</html>
